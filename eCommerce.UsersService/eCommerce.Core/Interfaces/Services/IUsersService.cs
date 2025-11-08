@@ -6,6 +6,6 @@ namespace eCommerce.Core.Interfaces.Services;
 
 public interface IUsersService
 {
-    Task<AuthenticationResponse> Login(LoginRequest request);
+    Task<AuthenticationResponse?> Login(LoginRequest request);
     Task<ApplicationUser?> Register(RegisterRequest request);
 }
