@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using eCommerce.Api.Middlewares;
 using eCommerce.Core;
 using eCommerce.Infraestructure;
@@ -10,11 +11,15 @@ var configuration = builder.Configuration;
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 services.AddOpenApi();
 
-services.AddInfrastructure();
+services.AddInfrastructure(configuration);
 
 services.AddCore();
 
-services.AddControllers();
+services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
 
 var app = builder.Build();
 
