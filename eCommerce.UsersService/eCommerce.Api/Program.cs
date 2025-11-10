@@ -1,7 +1,13 @@
+using System.Text;
 using System.Text.Json.Serialization;
 using eCommerce.Api.Middlewares;
 using eCommerce.Core;
+using eCommerce.Core.Entities;
+using eCommerce.Core.Options;
 using eCommerce.Infraestructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -24,12 +30,33 @@ services.AddControllers()
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
-configuration.SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true)
-    .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
-    .AddEnvironmentVariables();
+services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
+services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(options =>
+    {
+        var optionsJwt = configuration.GetSection("Jwt").Get<JwtOption>() ?? throw new InvalidOperationException("No JWT options found");
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = optionsJwt.Issuer,
+            ValidAudience = optionsJwt.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(optionsJwt.Key ?? throw new ArgumentNullException("JWT Key is null"))),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+services.AddAuthorization();
 
 var app = builder.Build();
 

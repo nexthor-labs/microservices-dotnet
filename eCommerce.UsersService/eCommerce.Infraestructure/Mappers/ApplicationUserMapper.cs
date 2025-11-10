@@ -13,6 +13,7 @@ public class ApplicationUserMapper : Profile
             .ForMember(dest => dest.Token, opt => opt.Ignore())
             .ForMember(dest => dest.Success, opt => opt.Ignore());
         CreateMap<RegisterRequest, ApplicationUser>()
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
             .ReverseMap();
     }
 }

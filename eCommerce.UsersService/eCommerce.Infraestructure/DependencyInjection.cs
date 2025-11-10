@@ -1,5 +1,6 @@
 ﻿using eCommerce.Core.Interfaces.Repositories;
 using eCommerce.Core.Interfaces.Services;
+using eCommerce.Core.Options;
 using eCommerce.Infraestructure.Mappers;
 using eCommerce.Infraestructure.Repositories;
 using eCommerce.Infraestructure.Services;
@@ -15,6 +16,8 @@ public static class DependencyInjection
     {
         services.AddTransient<IUsersRepository, UsersRepository>();
         services.AddTransient<IUsersService, UsersService>();
+        services.AddTransient<JwtTokenGenerator>();
+        services.Configure<JwtOption>(configuration.GetSection("Jwt"));
         services.AddAutoMapper(cfg =>
         {
             var licenceKey = configuration["MapperLicenseKey"];
@@ -36,7 +39,7 @@ public static class DependencyInjection
 
         services.AddDbContext<AppDbContext>(options =>
         {
-            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), b => b.MigrationsAssembly("eCommerce.Api"));
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         });
 
         return services;
