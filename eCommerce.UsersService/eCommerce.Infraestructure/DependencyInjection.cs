@@ -3,6 +3,7 @@ using eCommerce.Core.Interfaces.Services;
 using eCommerce.Infraestructure.Mappers;
 using eCommerce.Infraestructure.Repositories;
 using eCommerce.Infraestructure.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,9 +20,23 @@ public static class DependencyInjection
             var licenceKey = configuration["MapperLicenseKey"];
             if (string.IsNullOrEmpty(licenceKey))
                 throw new InvalidOperationException("Mapper license key is not configured.");
-            
+
             cfg.LicenseKey = licenceKey;
             cfg.AddProfile(new ApplicationUserMapper());
+        });
+
+        return services;
+    }
+    
+    public static IServiceCollection AddInfrastructureDbContext(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("eCommerceDbContext");
+        if (string.IsNullOrEmpty(connectionString))
+            throw new InvalidOperationException("Database connection string is not configured.");
+
+        services.AddDbContext<AppDbContext>(options =>
+        {
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), b => b.MigrationsAssembly("eCommerce.Api"));
         });
 
         return services;
