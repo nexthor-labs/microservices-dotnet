@@ -24,6 +24,19 @@ services.AddInfrastructureDbContext(configuration);
 
 services.AddInfrastructureValidators();
 
+var apiSettings = configuration.GetSection("Api:AllowedHosts").Get<string[]>();
+
+if (apiSettings is not null)
+{
+    services.AddCors(options =>
+    {
+        options.AddPolicy(UsersServiceConstants.CorsPolicy, builder =>
+            builder.WithOrigins(apiSettings!)
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+    });
+}
+
 services.AddCore();
 
 services.AddControllers()
@@ -60,6 +73,10 @@ services.AddAuthentication(options =>
 
 services.AddAuthorization();
 
+services.AddEndpointsApiExplorer();
+
+services.AddSwaggerGen();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -77,6 +94,14 @@ app.UseRouting();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+// Enable middleware to serve generated Swagger as a JSON endpoint.
+app.UseSwagger();
+
+// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+app.UseSwaggerUI();
+
+app.UseCors(UsersServiceConstants.CorsPolicy);
 
 app.MapControllers();
 
