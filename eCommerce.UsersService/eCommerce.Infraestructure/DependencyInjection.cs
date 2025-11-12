@@ -1,9 +1,12 @@
-﻿using eCommerce.Core.Interfaces.Repositories;
+﻿using eCommerce.Core.DTOs;
+using eCommerce.Core.Interfaces.Repositories;
 using eCommerce.Core.Interfaces.Services;
 using eCommerce.Core.Options;
 using eCommerce.Infraestructure.Mappers;
 using eCommerce.Infraestructure.Repositories;
 using eCommerce.Infraestructure.Services;
+using eCommerce.Infraestructure.Validators;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +33,7 @@ public static class DependencyInjection
 
         return services;
     }
-    
+
     public static IServiceCollection AddInfrastructureDbContext(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("eCommerceDbContext");
@@ -41,6 +44,14 @@ public static class DependencyInjection
         {
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         });
+
+        return services;
+    }
+    
+    public static IServiceCollection AddInfrastructureValidators(this IServiceCollection services)
+    {
+        services.AddScoped<IValidator<LoginRequest>, LoginRequestValidator>();
+        services.AddScoped<IValidator<RegisterRequest>, RegisterRequestValidator>();
 
         return services;
     }

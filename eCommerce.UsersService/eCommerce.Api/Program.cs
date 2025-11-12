@@ -22,6 +22,8 @@ services.AddInfrastructure(configuration);
 
 services.AddInfrastructureDbContext(configuration);
 
+services.AddInfrastructureValidators();
+
 services.AddCore();
 
 services.AddControllers()
