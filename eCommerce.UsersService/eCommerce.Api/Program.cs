@@ -29,6 +29,7 @@ var apiSettings = configuration.GetSection("Api:AllowedHosts").Get<string[]>();
 
 if (apiSettings is not null)
 {
+    Console.WriteLine("CORS Origins:", string.Join(", ", apiSettings));
     services.AddCors(options =>
     {
         options.AddPolicy(UsersServiceConstants.CorsPolicy, builder =>
