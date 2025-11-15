@@ -3,6 +3,8 @@ using eCommerce.Core.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using eCommerce.Infraestructure.Repositories;
+using eCommerce.Core.Interfaces;
 
 namespace eCommerce.Infraestructure;
 
@@ -10,6 +12,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<IProductsRepository, ProductsRepository>();
         services.Configure<JwtOption>(configuration.GetSection("Jwt"));
         services.AddAutoMapper(cfg =>
         {
