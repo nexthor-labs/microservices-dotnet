@@ -9,6 +9,8 @@ using eCommerce.Infraestructure.Mappers;
 using FluentValidation;
 using eCommerce.Core.DTOs;
 using eCommerce.Infraestructure.Validators;
+using eCommerce.Core.Interfaces.Services;
+using eCommerce.Infraestructure.Services;
 
 namespace eCommerce.Infraestructure;
 
@@ -17,6 +19,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IProductsRepository, ProductsRepository>();
+        services.AddScoped<IProductsService, ProductsService>();
         services.Configure<JwtOption>(configuration.GetSection("Jwt"));
         services.AddAutoMapper(cfg =>
         {
