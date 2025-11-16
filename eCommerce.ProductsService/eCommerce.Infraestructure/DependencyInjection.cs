@@ -4,7 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using eCommerce.Infraestructure.Repositories;
-using eCommerce.Core.Interfaces;
+using eCommerce.Core.Interfaces.Repositories;
+using eCommerce.Infraestructure.Mappers;
+using FluentValidation;
+using eCommerce.Core.DTOs;
+using eCommerce.Infraestructure.Validators;
 
 namespace eCommerce.Infraestructure;
 
@@ -21,7 +25,7 @@ public static class DependencyInjection
                 throw new InvalidOperationException("Mapper license key is not configured.");
 
             cfg.LicenseKey = licenceKey;
-            // cfg.AddProfile(new ApplicationUserMapper());
+            cfg.AddProfile(new ProductMapper());
         });
 
         return services;
@@ -43,6 +47,9 @@ public static class DependencyInjection
 
     public static IServiceCollection AddInfrastructureValidators(this IServiceCollection services)
     {
+        services.AddScoped<IValidator<ProductRequest>, ProductRequestValidator>();
+        services.AddScoped<IValidator<ProductUpdateStockRequest>, ProductUpdateStockValidator>();
+
         return services;
     }
 }

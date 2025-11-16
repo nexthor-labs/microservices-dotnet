@@ -1,7 +1,7 @@
 using System;
 using eCommerce.Core.Entities;
 
-namespace eCommerce.Core.Interfaces;
+namespace eCommerce.Core.Interfaces.Repositories;
 
 public interface IProductsRepository
 {
