@@ -16,16 +16,16 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllProducts()
+    public async Task<IActionResult> GetAllProducts(CancellationToken cancellationToken = default)
     {
-        var products = await _service.GetAllProductsAsync();
+        var products = await _service.GetAllProductsAsync(cancellationToken);
         return Ok(products);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductById(Guid id)
+    public async Task<IActionResult> GetProductById(Guid id, CancellationToken cancellationToken = default)
     {
-        var product = await _service.GetProductByIdAsync(id);
+        var product = await _service.GetProductByIdAsync(id, cancellationToken);
         if (product == null)
             return NotFound();
 
@@ -33,23 +33,23 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddProduct([FromBody] ProductRequest productRequest)
+    public async Task<IActionResult> AddProduct([FromBody] ProductRequest productRequest, CancellationToken cancellationToken = default)
     {
-        var product = await _service.AddProductAsync(productRequest);
+        var product = await _service.AddProductAsync(productRequest, cancellationToken);
         return CreatedAtAction(nameof(GetProductById), new { id = product.ProductID }, productRequest);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductRequest productRequest)
+    public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductRequest productRequest, CancellationToken cancellationToken = default)
     {
-        await _service.UpdateProductAsync(id, productRequest);
+        await _service.UpdateProductAsync(id, productRequest, cancellationToken);
         return NoContent();
     }
 
     [HttpPatch("{id}/stock")]
-    public async Task<IActionResult> UpdateProductStock(Guid id, [FromBody] ProductUpdateStockRequest productRequest)
+    public async Task<IActionResult> UpdateProductStock(Guid id, [FromBody] ProductUpdateStockRequest productRequest, CancellationToken cancellationToken = default)
     {
-        await _service.UpdateProductStockAsync(id, productRequest);
+        await _service.UpdateProductStockAsync(id, productRequest, cancellationToken);
         return NoContent();
     }
 }
