@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: ecommerce-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Users Service API
+  users-service:
+    image: nexthor/ecommerce-users-api
+    container_name: users-service
+    restart: unless-stopped
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__eCommerceDbContext=Server=mysql;Database=eCommerce.Users;User=root;Password=${MYSQL_ROOT_PASSWORD};
+      - Api__AllowedHosts__0=${ALLOWED_ORIGIN}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__ExpiryInMinutes=${JWT_EXPIRY_MINUTES}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  # Products Service API
+  products-service:
+    image: nexthor/ecommerce-products-api
+    container_name: products-service
+    restart: unless-stopped
+    ports:
+      - "5002:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__eCommerceDbContext=Server=mysql;Database=eCommerce.Products;User=root;Password=${MYSQL_ROOT_PASSWORD};
+      - Api__AllowedHosts__0=${ALLOWED_ORIGIN}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__ExpiryInMinutes=${JWT_EXPIRY_MINUTES}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
+  # Angular Frontend
+  frontend:
+    image: nexthor/ecommerce-frontend
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "6001:80"
+    depends_on:
+      - users-service
+      - products-service
+    networks:
+      - ecommerce-network
+
+networks:
+  ecommerce-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
