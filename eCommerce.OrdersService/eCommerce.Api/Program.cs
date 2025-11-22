@@ -1,4 +1,9 @@
+using eCommerce.Infraestructure.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Add MongoDB
+builder.Services.AddMongoDb(builder.Configuration);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

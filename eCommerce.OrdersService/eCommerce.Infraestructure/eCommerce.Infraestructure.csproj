@@ -7,13 +7,9 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" />
+    <PackageReference Include="MongoDB.Driver" />
   </ItemGroup>
 
 </Project>

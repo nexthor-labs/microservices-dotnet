@@ -4,6 +4,7 @@
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="MongoDB.Bson" />
   </ItemGroup>
 
 </Project>

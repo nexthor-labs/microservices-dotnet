@@ -28,10 +28,11 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.10" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
-    
+  </ItemGroup>
+
+</Project>
+  <ItemGroup>
     <!-- MongoDB -->
     <PackageVersion Include="MongoDB.Driver" Version="2.28.0" />
     <PackageVersion Include="MongoDB.Bson" Version="2.28.0" />
   </ItemGroup>
-
-</Project>
