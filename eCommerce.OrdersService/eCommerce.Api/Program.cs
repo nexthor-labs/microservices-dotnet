@@ -1,13 +1,103 @@
+using System.Text;
+using System.Text.Json.Serialization;
+using eCommerce.Api.Middlewares;
+using eCommerce.Core;
+using eCommerce.Core.Options;
+using eCommerce.Infraestructure;
 using eCommerce.Infraestructure.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add MongoDB
-builder.Services.AddMongoDb(builder.Configuration);
+var services = builder.Services;
+var configuration = builder.Configuration;
+var environment = builder.Environment;
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+services.AddOpenApi();
+
+services.AddInfrastructure(configuration);
+
+services.AddMongoDb(configuration);
+
+services.AddInfrastructureValidators();
+
+var apiSettings = configuration.GetSection("Api:AllowedHosts").Get<string[]>();
+
+if (apiSettings is not null)
+{
+    Console.WriteLine("CORS Origins:", string.Join(", ", apiSettings));
+    services.AddCors(options =>
+    {
+        options.AddPolicy(OrdersServiceConstants.CorsPolicy, builder =>
+            builder.WithOrigins(apiSettings!)
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+    });
+}
+
+services.AddCors();
+
+services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+
+services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(options =>
+    {
+        var optionsJwt = configuration.GetSection("Jwt").Get<JwtOption>() ?? throw new InvalidOperationException("No JWT options found");
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = optionsJwt.Issuer,
+            ValidAudience = optionsJwt.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(optionsJwt.Key ?? throw new ArgumentNullException("JWT Key is null"))),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+services.AddAuthorization();
+
+services.AddEndpointsApiExplorer();
+
+services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition(name: JwtBearerDefaults.AuthenticationScheme, securityScheme: new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Enter the Bearer Authorization string as following: 'Bearer {Generated Jwt Token}'",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = JwtBearerDefaults.AuthenticationScheme
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = JwtBearerDefaults.AuthenticationScheme
+                }
+            },
+            new string[]{}
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -19,28 +109,22 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.UseExceptionHandling();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.UseRouting();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
+
+// Enable middleware to serve generated Swagger as a JSON endpoint.
+app.UseSwagger();
+
+// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+app.UseSwaggerUI();
+
+app.UseCors(OrdersServiceConstants.CorsPolicy);
+
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

@@ -10,14 +10,14 @@ public static class MongoDbServiceExtensions
     public static IServiceCollection AddMongoDb(this IServiceCollection services, IConfiguration configuration)
     {
         // Bind MongoDB configuration
-        var mongoDbOptions = configuration.GetSection("MongoDb").Get<MongoDbOptions>();
+        var mongoDbOptions = configuration.GetSection("MongoDb").Get<MongoDbOption>();
         
         if (mongoDbOptions == null || string.IsNullOrEmpty(mongoDbOptions.ConnectionString))
         {
             throw new InvalidOperationException("MongoDB configuration is missing or invalid.");
         }
 
-        services.Configure<MongoDbOptions>(configuration.GetSection("MongoDb"));
+        services.Configure<MongoDbOption>(configuration.GetSection("MongoDb"));
 
         // Register MongoDB client as singleton
         services.AddSingleton<IMongoClient>(sp =>
@@ -26,7 +26,7 @@ public static class MongoDbServiceExtensions
         });
 
         // Register AppDbContext
-        services.AddScoped<AppDbContext>(sp =>
+        services.AddScoped(sp =>
         {
             var mongoClient = sp.GetRequiredService<IMongoClient>();
             return new AppDbContext(mongoClient, mongoDbOptions.DatabaseName);
