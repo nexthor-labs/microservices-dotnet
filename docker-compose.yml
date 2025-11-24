@@ -20,6 +20,26 @@ services:
       timeout: 20s
       retries: 10
 
+  # MongoDB Database
+  mongodb:
+    image: mongo:8.0
+    container_name: ecommerce-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: eCommerce.Orders
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - ecommerce-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      timeout: 20s
+      retries: 10
+
   # Users Service API
   users-service:
     image: nexthor/ecommerce-users-api
@@ -62,6 +82,28 @@ services:
     networks:
       - ecommerce-network
 
+  # Orders Service API
+  orders-service:
+    image: nexthor/ecommerce-orders-api
+    container_name: orders-service
+    restart: unless-stopped
+    ports:
+      - "5003:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__MongoDb=mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017
+      - MongoDb__DatabaseName=eCommerce.Orders
+      - Api__AllowedHosts__0=${ALLOWED_ORIGIN}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__ExpiryInMinutes=${JWT_EXPIRY_MINUTES}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - ecommerce-network
+
   # Angular Frontend
   frontend:
     image: nexthor/ecommerce-frontend
@@ -72,6 +114,7 @@ services:
     depends_on:
       - users-service
       - products-service
+      - orders-service
     networks:
       - ecommerce-network
 
@@ -81,3 +124,4 @@ networks:
 
 volumes:
   mysql_data:
+  mongodb_data:
