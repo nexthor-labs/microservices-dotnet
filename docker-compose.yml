@@ -33,7 +33,6 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-      - ./eCommerce.OrdersService/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
       - ecommerce-network
     healthcheck:
@@ -45,8 +44,8 @@ services:
   users-service:
     build:
       context: .
-      dockerfile: eCommerce.UsersService/eCommerce.Api/Dockerfile.dev
-    image: nexthor/ecommerce-users-api:dev
+      dockerfile: eCommerce.ProductsService/eCommerce.Api/Dockerfile
+    image: nexthor/ecommerce-users-api
     container_name: users-service
     restart: unless-stopped
     ports:
@@ -67,10 +66,7 @@ services:
 
   # Products Service API
   products-service:
-    build:
-      context: .
-      dockerfile: eCommerce.ProductsService/eCommerce.Api/Dockerfile.dev
-    image: nexthor/ecommerce-products-api:dev
+    image: nexthor/ecommerce-products-api
     container_name: products-service
     restart: unless-stopped
     ports:

@@ -2,26 +2,23 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Copy Directory.Packages.props (Central Package Management)
-COPY Directory.Packages.props ./
-
 # Copy solution and project files
-COPY eCommerce.ProductsService/eCommerce.ProductsService.sln ./eCommerce.ProductsService/
-COPY eCommerce.ProductsService/eCommerce.Api/eCommerce.Api.csproj ./eCommerce.ProductsService/eCommerce.Api/
-COPY eCommerce.ProductsService/eCommerce.Core/eCommerce.Core.csproj ./eCommerce.ProductsService/eCommerce.Core/
-COPY eCommerce.ProductsService/eCommerce.Infraestructure/eCommerce.Infraestructure.csproj ./eCommerce.ProductsService/eCommerce.Infraestructure/
+COPY eCommerce.ProductsService.sln ./
+COPY eCommerce.Api/eCommerce.Api.csproj ./eCommerce.Api/
+COPY eCommerce.Core/eCommerce.Core.csproj ./eCommerce.Core/
+COPY eCommerce.Infraestructure/eCommerce.Infraestructure.csproj ./eCommerce.Infraestructure/
 
 # Restore dependencies
-WORKDIR /src/eCommerce.ProductsService
 RUN dotnet restore
 
 # Copy all source files
-COPY eCommerce.ProductsService/eCommerce.Api/ ./eCommerce.Api/
-COPY eCommerce.ProductsService/eCommerce.Core/ ./eCommerce.Core/
-COPY eCommerce.ProductsService/eCommerce.Infraestructure/ ./eCommerce.Infraestructure/
+COPY eCommerce.Api/ ./eCommerce.Api/
+COPY eCommerce.Core/ ./eCommerce.Core/
+COPY eCommerce.Infraestructure/ ./eCommerce.Infraestructure/
 
 # Build the application
-WORKDIR /src/eCommerce.ProductsService/eCommerce.Api
+WORKDIR /src/eCommerce.Api
+RUN dotnet tool install --global dotnet-ef
 RUN dotnet build -c Release -o /app/build
 
 # Publish stage
