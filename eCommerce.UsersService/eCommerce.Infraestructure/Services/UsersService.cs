@@ -40,7 +40,9 @@ public class UsersService : IUsersService
         {
             var response = _mapper.Map<AuthenticationResponse>(user);
             response.Success = true;
-            response.Token = _jwtTokenGenerator.GenerateToken(user);
+            var (token, expires) = _jwtTokenGenerator.GenerateToken(user);
+            response.Token = token;
+            response.Expires = expires;
             return response;
         }
         

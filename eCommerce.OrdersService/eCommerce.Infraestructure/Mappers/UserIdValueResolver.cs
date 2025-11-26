@@ -23,7 +23,7 @@ public class UserIdValueResolver : IValueResolver<OrderAddRequest, Order, string
         if (user?.Identity?.IsAuthenticated == true)
         {
             // Try to get the user ID from different possible claim types
-            var userId = user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
                       ?? user.FindFirst("sub")?.Value
                       ?? user.FindFirst("userId")?.Value
                       ?? user.FindFirst("id")?.Value;

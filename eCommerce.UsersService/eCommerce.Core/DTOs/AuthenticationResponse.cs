@@ -9,5 +9,6 @@ public class AuthenticationResponse
     public string? PersonName { get; set; }
     public string? Gender { get; set; }
     public string? Token { get; set; }
+    public DateTime Expires { get; set; }
     public bool Success { get; set; }
 }

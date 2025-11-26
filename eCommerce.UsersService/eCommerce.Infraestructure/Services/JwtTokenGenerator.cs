@@ -17,7 +17,7 @@ public class JwtTokenGenerator
         _jwtOption = jwtOption.Value ?? throw new ArgumentNullException(nameof(jwtOption));
     }
 
-    public string GenerateToken(ApplicationUser user)
+    public (string Token, DateTime expires) GenerateToken(ApplicationUser user)
     {
         var key = Encoding.UTF8.GetBytes(_jwtOption.Key ?? throw new ArgumentNullException("JWT Key is null"));
         var securityKey = new SymmetricSecurityKey(key);
@@ -29,13 +29,14 @@ public class JwtTokenGenerator
             new Claim(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+        var expires = DateTime.UtcNow.AddMinutes(_jwtOption.ExpiryInMinutes);
         var token = new JwtSecurityToken(
             issuer: _jwtOption.Issuer,
             audience: _jwtOption.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_jwtOption.ExpiryInMinutes),
+            expires,
             signingCredentials: credentials
         );
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        return (new JwtSecurityTokenHandler().WriteToken(token), expires);
     }
 }
