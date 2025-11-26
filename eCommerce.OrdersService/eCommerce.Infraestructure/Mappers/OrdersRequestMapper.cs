@@ -10,6 +10,7 @@ public class OrdersRequestMapper : Profile
     public OrdersRequestMapper()
     {
         CreateMap<OrderAddRequest, Order>()
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom<UserIdValueResolver>())
             .ReverseMap();
         
         CreateMap<OrderUpdateRequest, Order>()

@@ -17,6 +17,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddHttpContextAccessor();
         services.AddScoped<IOrdersRepository, OrdersRepository>();
         services.AddScoped<IOrdersService, OrdersService>();
         services.Configure<JwtOption>(configuration.GetSection("Jwt"));

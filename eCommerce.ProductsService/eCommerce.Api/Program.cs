@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using eCommerce.Infraestructure;
+using eCommerce.Infraestructure.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -108,6 +109,9 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<eCommerce.Infraestructure.AppDbContext>();
     dbContext.Database.Migrate();
+    
+    // Seed data only if the table is empty
+    dbContext.SeedDataIfEmpty();
 }
 
 // Configure the HTTP request pipeline.
