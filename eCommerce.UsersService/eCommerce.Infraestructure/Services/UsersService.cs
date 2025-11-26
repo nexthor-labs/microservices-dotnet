@@ -39,6 +39,7 @@ public class UsersService : IUsersService
         if (result.Succeeded && user != null)
         {
             var response = _mapper.Map<AuthenticationResponse>(user);
+            response.UserID = Guid.Parse(user.Id);
             response.Success = true;
             var (token, expires) = _jwtTokenGenerator.GenerateToken(user);
             response.Token = token;
