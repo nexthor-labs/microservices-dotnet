@@ -28,7 +28,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-      MONGO_INITDB_DATABASE: eCommerce.Orders
+      MONGO_INITDB_DATABASE: eCommerceOrders
     ports:
       - "27017:27017"
     volumes:
@@ -102,8 +102,8 @@ services:
       - "5003:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__MongoDb=mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017
-      - MongoDb__DatabaseName=eCommerce.Orders
+      - MongoDb__ConnectionString=mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017
+      - MongoDb__DatabaseName=eCommerceOrders
       - Api__AllowedHosts__0=${ALLOWED_ORIGIN}
       - Jwt__Issuer=${JWT_ISSUER}
       - Jwt__Audience=${JWT_AUDIENCE}
