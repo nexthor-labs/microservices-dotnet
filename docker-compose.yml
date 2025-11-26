@@ -44,7 +44,7 @@ services:
   users-service:
     build:
       context: .
-      dockerfile: eCommerce.ProductsService/eCommerce.Api/Dockerfile
+      dockerfile: eCommerce.UsersService/eCommerce.Api/Dockerfile
     image: nexthor/ecommerce-users-api
     container_name: users-service
     restart: unless-stopped
@@ -58,6 +58,7 @@ services:
       - Jwt__Audience=${JWT_AUDIENCE}
       - Jwt__Key=${JWT_KEY}
       - Jwt__ExpiryInMinutes=${JWT_EXPIRY_MINUTES}
+      - MapperLicenseKey=${MAPPER_LICENSE_KEY}
     depends_on:
       mysql:
         condition: service_healthy
@@ -66,6 +67,9 @@ services:
 
   # Products Service API
   products-service:
+    build:
+      context: .
+      dockerfile: eCommerce.ProductsService/eCommerce.Api/Dockerfile
     image: nexthor/ecommerce-products-api
     container_name: products-service
     restart: unless-stopped
@@ -79,6 +83,7 @@ services:
       - Jwt__Audience=${JWT_AUDIENCE}
       - Jwt__Key=${JWT_KEY}
       - Jwt__ExpiryInMinutes=${JWT_EXPIRY_MINUTES}
+      - MapperLicenseKey=${MAPPER_LICENSE_KEY}
     depends_on:
       mysql:
         condition: service_healthy
@@ -87,6 +92,9 @@ services:
 
   # Orders Service API
   orders-service:
+    build:
+      context: .
+      dockerfile: eCommerce.OrdersService/eCommerce.Api/Dockerfile
     image: nexthor/ecommerce-orders-api
     container_name: orders-service
     restart: unless-stopped
@@ -101,6 +109,7 @@ services:
       - Jwt__Audience=${JWT_AUDIENCE}
       - Jwt__Key=${JWT_KEY}
       - Jwt__ExpiryInMinutes=${JWT_EXPIRY_MINUTES}
+      - MapperLicenseKey=${MAPPER_LICENSE_KEY}
     depends_on:
       mongodb:
         condition: service_healthy
@@ -109,6 +118,9 @@ services:
 
   # Angular Frontend
   frontend:
+    build:
+      context: ./eCommerce
+      dockerfile: Dockerfile
     image: nexthor/ecommerce-frontend
     container_name: frontend
     restart: unless-stopped

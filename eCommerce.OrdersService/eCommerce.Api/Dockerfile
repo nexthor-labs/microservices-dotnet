@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-# Copy Directory.Packages.props (Central Package Management)
+# Copy Directory.Packages.props for centralized package management
 COPY Directory.Packages.props ./
 
 # Copy solution and project files
