@@ -12,11 +12,15 @@ public class OrdersController : ControllerBase
 {
     private readonly ILogger<OrdersController> _logger;
     private readonly IOrdersService _service;
+    private readonly IProductsService _productsService;
 
-    public OrdersController(ILogger<OrdersController> logger, IOrdersService service)
+    public OrdersController(ILogger<OrdersController> logger, 
+    IOrdersService service,
+    IProductsService productsService)
     {
         _logger = logger;
         _service = service;
+        _productsService = productsService;
     }
 
     [HttpGet]
@@ -59,6 +63,13 @@ public class OrdersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateOrderAsync([FromBody] OrderAddRequest request, CancellationToken cancellationToken)
     {
+        var isAvailable = await _productsService.IsProductAvailableAsync(request.Items.First().ProductId.ToString(), request.Items.First().Quantity);
+        if (!isAvailable)
+        {
+            _logger.LogWarning("Product with ID: {ProductId} is not available in the requested quantity.", request.Items.First().ProductId);
+            return BadRequest("Requested product is not available in the desired quantity.");
+        }
+
         _logger.LogInformation("Creating a new order.");
         var order = await _service.AddOrderAsync(request, cancellationToken);
         if (order == null)

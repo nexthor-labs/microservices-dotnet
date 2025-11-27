@@ -7,7 +7,7 @@ using eCommerce.Core.Interfaces.Services;
 using FluentValidation;
 
 namespace eCommerce.Infraestructure.Services;
-
+// TODO: I must add how to handle items by order (CRUD operations for OrderItems)
 public class OrdersService : IOrdersService
 {
     private readonly IOrdersRepository _repository;

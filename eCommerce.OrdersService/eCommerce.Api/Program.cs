@@ -20,6 +20,8 @@ services.AddOpenApi();
 
 services.AddInfrastructure(configuration);
 
+services.AddNamedHttpClients();
+
 services.AddMongoDb(configuration);
 
 services.AddInfrastructureValidators();

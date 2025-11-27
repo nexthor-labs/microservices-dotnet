@@ -110,6 +110,7 @@ services:
       - Jwt__Key=${JWT_KEY}
       - Jwt__ExpiryInMinutes=${JWT_EXPIRY_MINUTES}
       - MapperLicenseKey=${MAPPER_LICENSE_KEY}
+      - HttpClients__ProductsHttpClient__BaseAddress=${PRODUCTS_HTTPCLIENT_BASEADDRESS}
     depends_on:
       mongodb:
         condition: service_healthy
