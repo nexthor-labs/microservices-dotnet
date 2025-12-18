@@ -34,6 +34,18 @@ public class ProductsController : ControllerBase
         return Ok(product);
     }
 
+    [HttpGet("{id}/availability")]
+    public async Task<IActionResult> GetProductAvailabilityById(Guid id,[FromQuery] int quantity, CancellationToken cancellationToken = default)
+    {
+        var product = await _service.GetProductByIdAsync(id, cancellationToken);
+        if (product == null)
+            return NotFound();
+
+        if (product.QuantityInStock < quantity)
+            return BadRequest("Insufficient stock available.");
+        return Ok(product);
+    }
+
     [HttpPost]
     public async Task<IActionResult> AddProduct([FromBody] ProductRequest productRequest, CancellationToken cancellationToken = default)
     {
